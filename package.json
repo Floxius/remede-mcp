@@ -1,0 +1,28 @@
+{
+  "name": "remede-mcp",
+  "version": "1.0.0",
+  "description": "Serveur MCP local pour le dictionnaire français Remède : définitions, synonymes, antonymes, étymologies, conjugaisons, pluriels et rimes phonétiques (845 318 mots, hors-ligne).",
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "setup": "node setup.mjs",
+    "start": "node index.ts",
+    "test": "node test-mcp.mjs"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "dictionnaire",
+    "francais",
+    "french-dictionary",
+    "rimes",
+    "rhymes",
+    "remede",
+    "offline"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.6.5"
+  }
+}
