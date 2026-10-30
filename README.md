@@ -1,7 +1,7 @@
 # Remède MCP — dictionnaire français pour IA
 
 > [!WARNING]
-> **État de la source (oct. 2026)** : la base se télécharge depuis l'API officielle de Remède, dont le serveur est **intermittent** (certificat TLS expiré, projet au repos). Si `npm run setup` échoue, réessayez plus tard ou consultez [Dépannage](#dépannage) — le projet amont étant au repos, aucune base plus récente que février 2025 n'existe ; votre installation n'est jamais « dépassée ».
+> **Installation dépendante d'une source externe** : la base (~719 Mo) se télécharge depuis l'API officielle de Remède (`api-remede.camarm.fr`), un projet au repos dont le certificat TLS est expiré (géré automatiquement par `setup.mjs`). Si le serveur est injoignable au moment de votre installation, suivez la section [Dépannage](#dépannage). Aucune base plus récente que février 2025 n'existe : une installation réussie n'est jamais « dépassée ».
 
 Serveur [MCP](https://modelcontextprotocol.io) (Model Context Protocol) local qui expose le dictionnaire **[Remède](https://github.com/camarm-dev/remede) 1.4.0** à votre assistant IA : **845 318 mots** avec définitions, exemples, synonymes, antonymes, étymologies, pluriels, conjugaisons et rimes phonétiques (IPA).
 
@@ -53,7 +53,7 @@ Options de `setup.mjs` : `--variant remede|remede.en`, `--out <fichier>`. Le scr
 
 ## Dépannage
 
-Le serveur de l'API officielle est parfois injoignable pendant des heures, puis revient. Dans l'ordre :
+Si le serveur de l'API officielle est injoignable au moment de votre installation (possible, le projet étant au repos et non surveillé) :
 
 1. **Réessayez plus tard** — `npm run setup` (trois tentatives espacées sont déjà intégrées).
 2. **Base obtenue par un autre moyen** (copie d'un autre utilisateur, archive) — placez le fichier puis :
