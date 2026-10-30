@@ -1,5 +1,8 @@
 # Remède MCP — dictionnaire français pour IA
 
+> [!WARNING]
+> **État de la source (oct. 2026)** : la base se télécharge depuis l'API officielle de Remède, dont le serveur est **intermittent** (certificat TLS expiré, projet au repos). Si `npm run setup` échoue, réessayez plus tard ou consultez [Dépannage](#dépannage) — le projet amont étant au repos, aucune base plus récente que février 2025 n'existe ; votre installation n'est jamais « dépassée ».
+
 Serveur [MCP](https://modelcontextprotocol.io) (Model Context Protocol) local qui expose le dictionnaire **[Remède](https://github.com/camarm-dev/remede) 1.4.0** à votre assistant IA : **845 318 mots** avec définitions, exemples, synonymes, antonymes, étymologies, pluriels, conjugaisons et rimes phonétiques (IPA).
 
 100 % hors-ligne après installation : la base est ouverte en lecture seule depuis un fichier SQLite local, aucun accès réseau à l'usage.
@@ -47,6 +50,18 @@ La base est cherchée dans `data/remede.db` du dépôt ; l'environnement `REMEDE
 Options de `setup.mjs` : `--variant remede|remede.en`, `--out <fichier>`. Le script est idempotent — relancer ne retélécharge pas.
 
 > **Note TLS** : le certificat de `api-remede.camarm.fr` était expiré au moment de l'écriture (oct. 2026). `setup.mjs` désactive la vérification TLS **pour ce domaine uniquement**, le temps que le projet Remède le renouvelle.
+
+## Dépannage
+
+Le serveur de l'API officielle est parfois injoignable pendant des heures, puis revient. Dans l'ordre :
+
+1. **Réessayez plus tard** — `npm run setup` (trois tentatives espacées sont déjà intégrées).
+2. **Base obtenue par un autre moyen** (copie d'un autre utilisateur, archive) — placez le fichier puis :
+   `node setup.mjs --skip-download` (vérifie et crée les index sans télécharger).
+3. **Miroir** — `node setup.mjs --url <URL directe du fichier remede.db>`.
+4. Base anglaise (variante `remede.en`, plus petite) : `npm run setup -- --variant remede.en --min-words 1`.
+
+Si la source officielle venait à disparaître durablement, ce dépôt hébergerait une copie de la base en release asset (ce qui reste indésirable tant que la source vit, voir ci-dessous).
 
 ## Pourquoi la base n'est pas dans le dépôt ?
 
