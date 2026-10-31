@@ -78,7 +78,7 @@ function normalize(query: string): string {
     .normalize('NFD')
     .replace(/\p{Diacritic}/gu, '')
     .toLowerCase()
-    .replace(/[-''ʼ]/g, ' ')
+    .replace(/[-'’‘ʼ]/g, ' ')
     .trim()
 }
 
