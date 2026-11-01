@@ -49,6 +49,20 @@ type WordDoc = {
   phoneme: string
   pronunciation: { audio: string, credits: string } | null
   conjugations: Record<string, Record<string, Record<string, string>>> | null
+  // Champs d'enrichissement (bases enrichies uniquement — absents de la base
+  // officielle 1.4.0) : sections Wiktionnaire non reprises par Remède. Tous
+  // optionnels : les outils dégradent proprement sur la base officielle.
+  homophones?: string[]
+  paronymes?: string[]
+  quasi_synonymes?: string[]
+  derives?: string[]
+  apparentes?: string[]
+  expressions?: string[]
+  proverbes?: string[]
+  hyperonymes?: string[]
+  hyponymes?: string[]
+  holonymes?: string[]
+  meronymes?: string[]
 }
 type WordMeta = {
   word: string
@@ -168,6 +182,12 @@ function fmtDefinition(d: Definition, index: number): string {
   return parts.join('\n')
 }
 
+/** Liste tronquée pour l'affichage : « Label : a, b, c… (+N autres) ». */
+function fmtListe(label: string, items: string[], max = 15): string {
+  const shown = items.slice(0, max).join(', ')
+  return `${label} : ${shown}${items.length > max ? `… (+${items.length - max} autres)` : ''}`
+}
+
 function fmtWordHeader(word: string, doc: WordDoc, meta: WordMeta | undefined): string {
   const nature = meta && meta.nature !== '' ? ` (${meta.nature})` : ''
   let syllabes = ''
@@ -202,6 +222,27 @@ const server = new McpServer({ name: 'remede', version: '1.4.0' })
 
     if (doc.synonyms.length > 0) out.push(`\n## Synonymes\n${doc.synonyms.join(', ')}`)
     if (doc.antonyms.length > 0) out.push(`\n## Antonymes\n${doc.antonyms.join(', ')}`)
+    if ((doc.homophones?.length ?? 0) + (doc.paronymes?.length ?? 0) > 0) {
+      const lignesHp: string[] = []
+      if (doc.homophones?.length) lignesHp.push(fmtListe('Homophones', doc.homophones, 12))
+      if (doc.paronymes?.length) lignesHp.push(fmtListe('Paronymes', doc.paronymes, 12))
+      out.push(`\n## Homophones et paronymes\n${lignesHp.join('\n')}`)
+    }
+    if (doc.quasi_synonymes?.length) out.push(`\n## Mots proches\n${doc.quasi_synonymes.join(', ')}`)
+    const famille: [string, string[] | undefined, number][] = [
+      ['Dérivés', doc.derives, 15],
+      ['Apparentés', doc.apparentes, 10],
+      ['Expressions', doc.expressions, 10],
+      ['Proverbes', doc.proverbes, 10],
+      ['Hyperonymes', doc.hyperonymes, 8],
+      ['Hyponymes', doc.hyponymes, 8],
+      ['Holonymes', doc.holonymes, 8],
+      ['Méronymes', doc.meronymes, 8],
+    ]
+    const famillesPresentes = famille.filter(([, l]) => (l?.length ?? 0) > 0) as [string, string[], number][]
+    if (famillesPresentes.length > 0) {
+      out.push(`\n## Famille et voisinage\n${famillesPresentes.map(([label, l, max]) => fmtListe(label, l, max)).join('\n')}`)
+    }
     if (doc.etymologies.length > 0) out.push(`\n## Étymologie\n${doc.etymologies.map(clean).join('\n')}`)
     if (doc.plurals.length > 0) {
       out.push(`\n## Pluriels\n${doc.plurals.map((p) => `${clean(p.label)} : ${clean(p.singular)} → ${clean(p.plural)}`).join('\n')}`)
@@ -358,6 +399,52 @@ const server = new McpServer({ name: 'remede', version: '1.4.0' })
       }
     }
     return { content: [{ type: 'text', text: out.join('\n') }] }
+  })
+
+  server.registerTool('homophones', {
+    title: 'Homophones et paronymes d\'un mot',
+    description: 'Renvoie les homophones (mêmes sons, orthographes différentes : ver/verre/vert/vers) et les paronymes (sons proches, sens distincts : éminent/imminent) d\'un mot français. Utile pour lever les ambiguïtés à l\'écrit.',
+    inputSchema: { mot: zMot },
+  }, async ({ mot }) => {
+    const found = lookup(mot.trim())
+    if (!found) return { content: [{ type: 'text', text: notFound(mot) }] }
+    const { word, doc } = found
+    const h = doc.homophones ?? []
+    const p = doc.paronymes ?? []
+    if (h.length === 0 && p.length === 0) {
+      return { content: [{ type: 'text', text: `Aucun homophone ni paronyme répertorié pour « ${word} ».` }] }
+    }
+    const lignes: string[] = []
+    if (h.length > 0) lignes.push(`Homophones : ${h.join(', ')}`)
+    if (p.length > 0) lignes.push(`Paronymes : ${p.join(', ')}`)
+    return { content: [{ type: 'text', text: lignes.join('\n') }] }
+  })
+
+  server.registerTool('famille', {
+    title: 'Famille et voisinage d\'un mot',
+    description: 'Renvoie le voisinage sémantique d\'un mot français : dérivés et apparentés (famille de mots), expressions et proverbes liés, quasi-synonymes, hyperonymes/hyponymes (plus général/spécifique) et holonymes/méronymes (tout/partie). Utile pour explorer un champ lexical.',
+    inputSchema: { mot: zMot },
+  }, async ({ mot }) => {
+    const found = lookup(mot.trim())
+    if (!found) return { content: [{ type: 'text', text: notFound(mot) }] }
+    const { word, doc } = found
+    const groupes: [string, string[] | undefined, number][] = [
+      ['Dérivés', doc.derives, 40],
+      ['Apparentés', doc.apparentes, 40],
+      ['Expressions', doc.expressions, 40],
+      ['Proverbes', doc.proverbes, 40],
+      ['Quasi-synonymes', doc.quasi_synonymes, 40],
+      ['Hyperonymes (plus général)', doc.hyperonymes, 25],
+      ['Hyponymes (plus spécifique)', doc.hyponymes, 25],
+      ['Holonymes (tout qui contient)', doc.holonymes, 25],
+      ['Méronymes (parties)', doc.meronymes, 25],
+    ]
+    const presentes = groupes.filter(([, l]) => (l?.length ?? 0) > 0) as [string, string[], number][]
+    if (presentes.length === 0) {
+      return { content: [{ type: 'text', text: `Pas de famille ni voisinage répertorié pour « ${found.word} ».` }] }
+    }
+    const text = presentes.map(([label, l, max]) => fmtListe(label, l, max)).join('\n')
+    return { content: [{ type: 'text', text: `Voisinage de « ${word} » :\n${text}` }] }
   })
 
   async function main() {

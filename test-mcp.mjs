@@ -46,6 +46,8 @@ const toolsToTest = [
   { name: 'antonymes', arguments: { mot: 'rapide' } },
   { name: 'definir', arguments: { mot: 'château' } },
   { name: 'conjuguer', arguments: { verbe: 'chanter' } },
+  { name: 'homophones', arguments: { mot: 'vers' } },       // liste réelle sur base enrichie, « Aucun… » sur base officielle
+  { name: 'famille', arguments: { mot: 'roue' } },          // idem : dégradation propre attendue dans les deux cas
   { name: 'rechercher', arguments: { requete: 'phenom', limite: 6 } },
   { name: 'aleatoire', arguments: {} },
   { name: 'mot', arguments: { mot: '-onyme' } },
