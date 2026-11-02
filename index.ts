@@ -389,7 +389,16 @@ const server = new McpServer({ name: 'remede', version: '1.4.0' })
     if (!found) return { content: [{ type: 'text', text: notFound(verbe) }] }
     const conj = found.doc.conjugations
     if (!conj || Object.keys(conj).length === 0) {
-      return { content: [{ type: 'text', text: `« ${found.word} » n'est pas un verbe conjugué dans le dictionnaire.` }] }
+      const meta = stmtMeta.get(found.word) as WordMeta | undefined
+      const verbe = /\bVER\b|AUX/.test(meta?.nature ?? '')
+      return {
+        content: [{
+          type: 'text',
+          text: verbe
+            ? `« ${found.word} » est un verbe du dictionnaire, mais sa conjugaison est absente de la base (forme fléchie : conjuguez son lemme ; sinon trou de données hérité de la génération officielle — verbes rares ou accentés manqués chez la source de conjugaison).`
+            : `« ${found.word} » n'est pas un verbe conjugué dans le dictionnaire.`,
+        }],
+      }
     }
     const out: string[] = [`# Conjugaison de « ${found.word} »`]
     for (const [mode, temps] of Object.entries(conj)) {
