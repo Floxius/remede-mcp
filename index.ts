@@ -63,6 +63,7 @@ type WordDoc = {
   hyponymes?: string[]
   holonymes?: string[]
   meronymes?: string[]
+  vocabulaire?: string[]
 }
 type WordMeta = {
   word: string
@@ -238,6 +239,7 @@ const server = new McpServer({ name: 'remede', version: '1.4.0' })
       ['Hyponymes', doc.hyponymes, 8],
       ['Holonymes', doc.holonymes, 8],
       ['Méronymes', doc.meronymes, 8],
+      ['Champ lexical', doc.vocabulaire, 10],
     ]
     const famillesPresentes = famille.filter(([, l]) => (l?.length ?? 0) > 0) as [string, string[], number][]
     if (famillesPresentes.length > 0) {
@@ -447,6 +449,7 @@ const server = new McpServer({ name: 'remede', version: '1.4.0' })
       ['Hyponymes (plus spécifique)', doc.hyponymes, 25],
       ['Holonymes (tout qui contient)', doc.holonymes, 25],
       ['Méronymes (parties)', doc.meronymes, 25],
+      ['Champ lexical (thésaurus)', doc.vocabulaire, 40],
     ]
     const presentes = groupes.filter(([, l]) => (l?.length ?? 0) > 0) as [string, string[], number][]
     if (presentes.length === 0) {

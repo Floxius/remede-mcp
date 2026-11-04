@@ -17,7 +17,7 @@ Serveur [MCP](https://modelcontextprotocol.io) (Model Context Protocol) local qu
 | `rimes` | Rimes par suffixe phonétique (IPA) : qualité (1-10), syllabes min/max, rimes féminines, élidables, nature grammaticale, pagination |
 | `conjuguer` | Tableau complet d'un verbe (indicatif, subjonctif, conditionnel, impératif, participe) |
 | `homophones` | Homophones (ver/verre/vert/vers) et paronymes (éminent/imminent) — pour lever les ambiguïtés à l'écrit |
-| `famille` | Voisinage sémantique : dérivés, apparentés, expressions et proverbes liés, quasi-synonymes, hyperonymes/hyponymes, holonymes/méronymes |
+| `famille` | Voisinage sémantique : dérivés, apparentés, expressions et proverbes liés, quasi-synonymes, hyperonymes/hyponymes, holonymes/méronymes, champ lexical (thésaurus) |
 | `rechercher` | Recherche par préfixe, insensible à la casse et aux accents |
 | `aleatoire` | Un mot au hasard avec sa fiche |
 
@@ -25,7 +25,7 @@ Recherche et rimes sont indexées (colonne `phoneme_rev` créée à l'installati
 
 ## Au-delà de Remède 1.4.0 : champs d'enrichissement
 
-Ce serveur sait aussi servir des bases **enrichies** : onze champs optionnels absents de la base officielle — homophones, paronymes, quasi-synonymes, dérivés, apparentés, expressions, proverbes, hyperonymes, hyponymes, holonymes et méronymes — extraits **hors-ligne du dump du Wiktionnaire francophone**, dans les sections que Remède n'exploite pas (`==== {{S|dérivés}} ====`, `{{S|homophones}}`, `{{S|hyperonymes}}`…). Aucune visite de site tiers pour ces données : une relecture du dump suffit, et la mise à jour se réduit à rejouer l'extraction à chaque nouveau dump (~2 fois par mois).
+Ce serveur sait aussi servir des bases **enrichies** : douze champs optionnels absents de la base officielle — homophones, paronymes, quasi-synonymes, dérivés, apparentés, expressions, proverbes, hyperonymes, hyponymes, holonymes, méronymes et vocabulaire (champ lexical thématique du thésaurus) — extraits **hors-ligne du dump du Wiktionnaire francophone**, dans les sections que Remède n'exploite pas (`==== {{S|dérivés}} ====`, `{{S|homophones}}`, `{{S|hyperonymes}}`, pages `Thésaurus:<thème>/français`…). Aucune visite de site tiers pour ces données : une relecture du dump suffit, et la mise à jour se réduit à rejouer l'extraction à chaque nouveau dump (~2 fois par mois).
 
 Les outils `homophones` et `famille` les exposent, et la fiche `mot` gagne les sections correspondantes. La base téléchargée par `npm run setup` (officielle, 1.4.0) n'a pas ces champs : sur elle, `homophones` et `famille` répondent simplement qu'aucune donnée n'est répertoriée, et la fiche `mot` omet ces sections — aucun comportement cassé, aucun changement de schéma obligatoire.
 
